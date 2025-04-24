@@ -313,8 +313,8 @@ class OpenAIRealtimeWebRTCTransport(
             for (message in initialMessages.map { it.convertFromValue(LLMContextMessage.serializer()) }) {
                 sendConversationMessage(role = message.role, text = message.content)
             }
-            requestResponseFromBot()
         }
+        requestResponseFromBot()
     }
 
     fun sendConfigUpdate(config: Value) {
