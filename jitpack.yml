@@ -1,8 +1,5 @@
 jdk:
-  - openjdk17        # JitPack looks for this exact token
+  - openjdk17            # AGP 8.x requires 17+
 
 install:
-  - ./gradlew \
-    -xsignReleasePublication \
-    -xsignDebugPublication \
-    publishToMavenLocal
+  - ./gradlew publishToMavenLocal
