@@ -76,7 +76,7 @@ class OpenAIRealtimeWebRTCTransport(
 
         fun buildConfig(
             apiKey: String,
-            model: String = "gpt-4o-realtime-preview-2024-12-17",
+            model: String = "gpt-4o-mini-realtime-preview-2024-12-17",
             initialMessages: List<LLMContextMessage>? = null,
             initialConfig: OpenAIRealtimeSessionConfig? = null
         ): List<ServiceConfig> {
@@ -163,6 +163,12 @@ class OpenAIRealtimeWebRTCTransport(
                     }
                 }
 
+                "response.audio_transcript.done" -> {
+                    if (msg.transcript != null) {
+                        transportContext.callbacks.onBotTranscript(msg.transcript)
+                    }
+                }
+
                 "conversation.item.input_audio_transcription.completed" -> {
                     if (msg.transcript != null) {
                         transportContext.callbacks.onUserTranscript(
@@ -205,6 +211,7 @@ class OpenAIRealtimeWebRTCTransport(
 
                 else -> {
                     Log.i(TAG, "Ignoring incoming event with type '${msg.type}'")
+
                 }
             }
         }
