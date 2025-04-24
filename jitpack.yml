@@ -1,4 +1,8 @@
 jdk:
-  - 17           # AGP 8.4+ needs Java 17 :contentReference[oaicite:1]{index=1}
+  - openjdk17        # JitPack looks for this exact token
+
 install:
-  - ./gradlew -xsignReleasePublication -xsignDebugPublication publishToMavenLocal
+  - ./gradlew \
+    -xsignReleasePublication \
+    -xsignDebugPublication \
+    publishToMavenLocal
