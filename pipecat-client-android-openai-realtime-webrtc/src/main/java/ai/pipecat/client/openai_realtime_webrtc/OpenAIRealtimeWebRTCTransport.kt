@@ -343,6 +343,13 @@ class OpenAIRealtimeWebRTCTransport(
         )
     }
 
+    fun cancelBotResponse() {
+        client?.sendDataMessage(
+            OpenAIResponseCancel.serializer(),
+            OpenAIResponseCancel.new()
+        )
+    }
+
     override fun disconnect(): Future<Unit, RTVIError> = thread.runOnThreadReturningFuture {
         withPromise(thread) { promise ->
 
@@ -440,6 +447,11 @@ class OpenAIRealtimeWebRTCTransport(
 
                 requestResponseFromBot()
 
+                return resolvedPromiseOk(thread, Unit)
+            }
+
+            "cancel-response" -> {
+                cancelBotResponse()
                 return resolvedPromiseOk(thread, Unit)
             }
 
