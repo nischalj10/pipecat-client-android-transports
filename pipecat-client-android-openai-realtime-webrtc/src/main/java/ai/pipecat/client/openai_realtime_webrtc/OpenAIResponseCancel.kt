@@ -1,6 +1,7 @@
 package ai.pipecat.client.openai_realtime_webrtc
 
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.SerialName
 
 @Serializable
 internal data class OpenAIResponseCancel private constructor(
