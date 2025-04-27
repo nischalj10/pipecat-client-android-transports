@@ -60,6 +60,8 @@ private inline fun <reified E> E.convertToValue(serializer: KSerializer<E>) =
 private inline fun <reified E> Value.convertFromValue(serializer: KSerializer<E>): E =
     JSON.decodeFromJsonElement(serializer, JSON.encodeToJsonElement(Value.serializer(), this))
 
+private var currentResponseId: String? = null
+
 class OpenAIRealtimeWebRTCTransport(
     private val transportContext: TransportContext,
     androidContext: Context
@@ -209,6 +211,26 @@ class OpenAIRealtimeWebRTCTransport(
                     ))
                 }
 
+                // Track response creation
+                "response.created" -> {
+                    if (msg.responseId != null) {
+                        currentResponseId = msg.responseId
+                        Log.i(TAG, "Response created with ID: $currentResponseId")
+                    }
+                }
+
+                // Clear the response ID when response is done
+                "response.done" -> {
+                    Log.i(TAG, "Response completed with ID: $currentResponseId")
+                    currentResponseId = null
+                }
+
+                // Clear the response ID when response is cancelled
+                "response.cancelled" -> {
+                    Log.i(TAG, "Response cancelled with ID: $currentResponseId")
+                    currentResponseId = null
+                }
+
                 else -> {
                     Log.i(TAG, "Ignoring incoming event with type '${msg.type}'")
 
@@ -344,10 +366,19 @@ class OpenAIRealtimeWebRTCTransport(
     }
 
     fun cancelBotResponse() {
-        client?.sendDataMessage(
-            OpenAIResponseCancel.serializer(),
-            OpenAIResponseCancel.new()
-        )
+        currentResponseId?.let { responseId ->
+            client?.sendDataMessage(
+                OpenAIResponseCancel.serializer(),
+                OpenAIResponseCancel.withResponseId(responseId)
+            )
+        } ?: run {
+            // If no current response ID is available, try with a generic cancel
+            client?.sendDataMessage(
+                OpenAIResponseCancel.serializer(),
+                OpenAIResponseCancel.new()
+            )
+            Log.w(TAG, "Attempting to cancel response without a response ID")
+        }
     }
 
     override fun disconnect(): Future<Unit, RTVIError> = thread.runOnThreadReturningFuture {

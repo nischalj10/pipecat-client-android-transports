@@ -13,6 +13,8 @@ internal data class OpenAIEvent(
     val name: String? = null,
     @SerialName("call_id")
     val callId: String? = null,
+    @SerialName("response_id")
+    val responseId: String? = null,
     val arguments: Value? = null,
 ) {
     @Serializable
