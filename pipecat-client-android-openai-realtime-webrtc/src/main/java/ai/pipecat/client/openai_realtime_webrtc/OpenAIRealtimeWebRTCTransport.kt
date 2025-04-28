@@ -366,6 +366,13 @@ class OpenAIRealtimeWebRTCTransport(
     }
 
     fun cancelBotResponse() {
+        //clear output audio buffer first before sending the cancel response call
+        client?.sendDataMessage(
+            ClearOutputAudioBuffer.serializer(),
+            ClearOutputAudioBuffer.new()
+        )
+
+        //call cancel bot response
         currentResponseId?.let { responseId ->
             client?.sendDataMessage(
                 OpenAIResponseCancel.serializer(),
