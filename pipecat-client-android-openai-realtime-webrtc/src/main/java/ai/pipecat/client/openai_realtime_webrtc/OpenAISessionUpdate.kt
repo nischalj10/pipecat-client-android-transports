@@ -11,7 +11,19 @@ internal data class OpenAISessionUpdate private constructor(
     companion object {
         fun of(session: Value) = OpenAISessionUpdate(
             type = "session.update",
-            session = session
+            session = when (session) {
+                is Value.Object -> {
+                    // Ensure turnDetection is explicitly included as Value.Null if it's meant to be null
+                    if ("turn_detection" !in session.value) {
+                        Value.Object(session.value + ("turn_detection" to Value.Null))
+                    } else {
+                        session
+                    }
+                }
+                else -> session
+            }
         )
     }
 }
+
+
