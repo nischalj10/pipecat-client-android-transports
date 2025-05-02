@@ -40,7 +40,10 @@ import kotlinx.serialization.json.decodeFromJsonElement
 import kotlinx.serialization.json.encodeToJsonElement
 
 
-private val JSON = Json { ignoreUnknownKeys = true }
+private val JSON = Json {
+    ignoreUnknownKeys = true
+    explicitNulls = true   // This will encode null values explicitly like turn_detection = null
+}
 
 private val BOT_PARTICIPANT = Participant(
     id = ParticipantId("bot"),
