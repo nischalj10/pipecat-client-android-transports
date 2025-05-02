@@ -368,6 +368,13 @@ class OpenAIRealtimeWebRTCTransport(
         )
     }
 
+    fun commitInputAudioBuffer() {
+        client?.sendDataMessage(
+            CommitInputAudioBuffer.serializer(),
+            CommitInputAudioBuffer.new()
+        )
+    }
+
     fun cancelBotResponse() {
         //clear output audio buffer first before sending the cancel response call
         client?.sendDataMessage(
@@ -497,6 +504,7 @@ class OpenAIRealtimeWebRTCTransport(
             }
 
             "create-response" -> {
+                commitInputAudioBuffer()
                 requestResponseFromBot()
                 return resolvedPromiseOk(thread, Unit)
             }
