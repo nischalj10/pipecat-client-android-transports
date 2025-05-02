@@ -493,6 +493,11 @@ class OpenAIRealtimeWebRTCTransport(
                 return resolvedPromiseOk(thread, Unit)
             }
 
+            "create-response" -> {
+                requestResponseFromBot()
+                return resolvedPromiseOk(thread, Unit)
+            }
+
             else -> {
                 return operationNotSupported()
             }
