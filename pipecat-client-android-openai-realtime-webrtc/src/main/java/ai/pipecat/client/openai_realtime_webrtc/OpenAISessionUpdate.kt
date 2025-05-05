@@ -1,8 +1,10 @@
 package ai.pipecat.client.openai_realtime_webrtc
 
 import ai.pipecat.client.types.Value
+import android.annotation.SuppressLint
 import kotlinx.serialization.Serializable
 
+@SuppressLint("UnsafeOptInUsageError")
 @Serializable
 internal data class OpenAISessionUpdate private constructor(
     val type: String,

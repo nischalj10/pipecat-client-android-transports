@@ -1,9 +1,11 @@
 package ai.pipecat.client.openai_realtime_webrtc
 
 import ai.pipecat.client.types.Value
+import android.annotation.SuppressLint
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
+@SuppressLint("UnsafeOptInUsageError")
 @Serializable
 internal data class OpenAIEvent(
     val type: String,

@@ -34,6 +34,7 @@ import android.util.Log
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.launch
 import kotlinx.serialization.KSerializer
+import kotlinx.serialization.Serializable
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.decodeFromJsonElement
@@ -55,6 +56,13 @@ private val LOCAL_PARTICIPANT = Participant(
     id = ParticipantId("local"),
     name = null,
     local = true
+)
+
+@SuppressLint("UnsafeOptInUsageError")
+@Serializable
+private data class TruncateConversationItemData(
+    val itemId: String,
+    val audioEndMs: Int
 )
 
 private inline fun <reified E> E.convertToValue(serializer: KSerializer<E>) =
@@ -398,6 +406,16 @@ class OpenAIRealtimeWebRTCTransport(
         }
     }
 
+    fun truncateConversationItem(itemId: String, audioEndMs: Int) {
+        client?.sendDataMessage(
+            OpenAIConversationItemTruncate.serializer(),
+            OpenAIConversationItemTruncate.new(
+                itemId = itemId,
+                audioEndMs = audioEndMs
+            )
+        )
+    }
+
     override fun disconnect(): Future<Unit, RTVIError> = thread.runOnThreadReturningFuture {
         withPromise(thread) { promise ->
 
@@ -507,6 +525,19 @@ class OpenAIRealtimeWebRTCTransport(
                 commitInputAudioBuffer()
                 requestResponseFromBot()
                 return resolvedPromiseOk(thread, Unit)
+            }
+
+            "truncate-conversation-item" -> {
+                try {
+                    // Parse the JSON data to get itemId and audioEndMs
+                    val data = JSON.decodeFromJsonElement<TruncateConversationItemData>(message.data
+                        ?: return resolvedPromiseErr(thread, RTVIError.OtherError("Missing data for truncate-conversation-item")))
+
+                    truncateConversationItem(data.itemId, data.audioEndMs)
+                    return resolvedPromiseOk(thread, Unit)
+                } catch (e: Exception) {
+                    return resolvedPromiseErr(thread, RTVIError.ExceptionThrown(e))
+                }
             }
 
             else -> {
