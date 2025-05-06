@@ -228,8 +228,8 @@ class OpenAIRealtimeWebRTCTransport(
 
                 // Track response creation
                 "response.created" -> {
-                    if (msg.responseId != null) {
-                        currentResponseId = msg.responseId
+                    if (msg.response?.id != null) {
+                        currentResponseId = msg.response.id
                         Log.i(TAG, "Response created with ID: $currentResponseId")
                     }
                 }

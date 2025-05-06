@@ -18,6 +18,8 @@ internal data class OpenAIEvent(
     @SerialName("response_id")
     val responseId: String? = null,
     val arguments: Value? = null,
+    // For response.created events
+    val response: Response? = null,
     // For conversation.item.created events
     val item: Item? = null,
     // For truncation events
@@ -37,5 +39,10 @@ internal data class OpenAIEvent(
     internal data class Item(
         val id: String,
         val role: String? = null
+    )
+
+    @Serializable
+    internal data class Response(
+        val id: String,
     )
 }
