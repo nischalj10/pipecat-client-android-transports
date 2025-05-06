@@ -424,7 +424,7 @@ class OpenAIRealtimeWebRTCTransport(
     }
 
     // truncate the current assistant message
-    fun truncateCurrentAssistantMessage(audioEndMs: Int): Future<Unit, RTVIError> {
+    fun truncateCurrentAssistantMessage(audioEndMs: Int, contentIndex: Int): Future<Unit, RTVIError> {
         return thread.runOnThreadReturningFuture {
             currentAssistantItemId?.let { itemId ->
                 client?.sendDataMessage(
@@ -432,7 +432,7 @@ class OpenAIRealtimeWebRTCTransport(
                     OpenAIConversationItemTruncate.new(
                         itemId = itemId,
                         audioEndMs = audioEndMs,
-                        contentIndex = 0
+                        contentIndex = contentIndex
                     )
                 )
                 resolvedPromiseOk(thread, Unit)
@@ -561,7 +561,7 @@ class OpenAIRealtimeWebRTCTransport(
                     val data = JSON.decodeFromJsonElement<TruncateConversationItemData>(message.data
                         ?: return resolvedPromiseErr(thread, RTVIError.OtherError("Missing data for truncate-conversation-item")))
 
-                    truncateCurrentAssistantMessage(data.audioEndMs)
+                    truncateCurrentAssistantMessage(data.audioEndMs, data.contentIndex)
                     return resolvedPromiseOk(thread, Unit)
                 } catch (e: Exception) {
                     return resolvedPromiseErr(thread, RTVIError.ExceptionThrown(e))
