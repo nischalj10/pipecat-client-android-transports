@@ -18,6 +18,11 @@ internal data class OpenAIEvent(
     @SerialName("response_id")
     val responseId: String? = null,
     val arguments: Value? = null,
+    // For conversation.item.created events
+    val item: Item? = null,
+    // For truncation events
+    @SerialName("item_id")
+    val itemId: String? = null,
 ) {
     @Serializable
     internal data class Error(
@@ -27,4 +32,10 @@ internal data class OpenAIEvent(
     ) {
         fun describe() = message ?: code ?: type
     }
+
+    @Serializable
+    internal data class Item(
+        val id: String,
+        val role: String? = null
+    )
 }

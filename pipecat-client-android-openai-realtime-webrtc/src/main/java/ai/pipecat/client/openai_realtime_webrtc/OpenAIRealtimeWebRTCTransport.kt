@@ -61,7 +61,6 @@ private val LOCAL_PARTICIPANT = Participant(
 @SuppressLint("UnsafeOptInUsageError")
 @Serializable
 private data class TruncateConversationItemData(
-    val itemId: String,
     val audioEndMs: Int
 )
 
@@ -70,8 +69,6 @@ private inline fun <reified E> E.convertToValue(serializer: KSerializer<E>) =
 
 private inline fun <reified E> Value.convertFromValue(serializer: KSerializer<E>): E =
     JSON.decodeFromJsonElement(serializer, JSON.encodeToJsonElement(Value.serializer(), this))
-
-private var currentResponseId: String? = null
 
 class OpenAIRealtimeWebRTCTransport(
     private val transportContext: TransportContext,
@@ -86,6 +83,12 @@ class OpenAIRealtimeWebRTCTransport(
         private const val OPTION_INITIAL_MESSAGES = "initial_messages"
         private const val OPTION_INITIAL_CONFIG = "initial_config"
         private const val OPTION_MODEL = "model"
+
+        //the current assistant item being generated
+        private var currentAssistantItemId: String? = null
+
+        //the current response id being generated
+        private var currentResponseId: String? = null
 
         fun buildConfig(
             apiKey: String,
@@ -241,6 +244,19 @@ class OpenAIRealtimeWebRTCTransport(
                     Log.i(TAG, "Response cancelled with ID: $currentResponseId")
                     currentResponseId = null
                 }
+
+                // If this is an assistant message, store its ID for potential truncation
+                "conversation.item.created" -> {
+                    if (msg.item?.role == "assistant") {
+                        currentAssistantItemId = msg.item.id
+                        Log.i(TAG, "Storing assistant item ID for truncation: $currentAssistantItemId")
+                    }
+                }
+
+                "conversation.item.truncated" -> {
+                    Log.i(TAG, "Conversation item truncated: ${msg.itemId}")
+                }
+
 
                 else -> {
                     Log.i(TAG, "Ignoring incoming event with type '${msg.type}'")
@@ -406,15 +422,25 @@ class OpenAIRealtimeWebRTCTransport(
         }
     }
 
-    fun truncateConversationItem(itemId: String, audioEndMs: Int) {
-        client?.sendDataMessage(
-            OpenAIConversationItemTruncate.serializer(),
-            OpenAIConversationItemTruncate.new(
-                itemId = itemId,
-                audioEndMs = audioEndMs
+    // truncate the current assistant message
+    fun truncateCurrentAssistantMessage(audioEndMs: Int): Future<Unit, RTVIError> {
+        return thread.runOnThreadReturningFuture {
+            currentAssistantItemId?.let { itemId ->
+                client?.sendDataMessage(
+                    OpenAIConversationItemTruncate.serializer(),
+                    OpenAIConversationItemTruncate.new(
+                        itemId = itemId,
+                        audioEndMs = audioEndMs
+                    )
+                )
+                resolvedPromiseOk(thread, Unit)
+            } ?: resolvedPromiseErr(
+                thread,
+                RTVIError.OtherError("No active assistant message to truncate")
             )
-        )
+        }
     }
+
 
     override fun disconnect(): Future<Unit, RTVIError> = thread.runOnThreadReturningFuture {
         withPromise(thread) { promise ->
@@ -533,7 +559,7 @@ class OpenAIRealtimeWebRTCTransport(
                     val data = JSON.decodeFromJsonElement<TruncateConversationItemData>(message.data
                         ?: return resolvedPromiseErr(thread, RTVIError.OtherError("Missing data for truncate-conversation-item")))
 
-                    truncateConversationItem(data.itemId, data.audioEndMs)
+                    truncateCurrentAssistantMessage(data.audioEndMs)
                     return resolvedPromiseOk(thread, Unit)
                 } catch (e: Exception) {
                     return resolvedPromiseErr(thread, RTVIError.ExceptionThrown(e))
