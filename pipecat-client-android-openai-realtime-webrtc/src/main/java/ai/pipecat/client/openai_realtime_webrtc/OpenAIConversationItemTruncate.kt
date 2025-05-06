@@ -10,10 +10,10 @@ internal data class OpenAIConversationItemTruncate private constructor(
     val type: String,
     @SerialName("item_id") val itemId: String,
     @SerialName("audio_end_ms") val audioEndMs: Int,
-    @SerialName("content_index") val contentIndex: Int = 0
+    @SerialName("content_index") val contentIndex: Int
 ) {
     companion object {
-        fun new(itemId: String, audioEndMs: Int, contentIndex: Int = 0) = OpenAIConversationItemTruncate(
+        fun new(itemId: String, audioEndMs: Int, contentIndex: Int) = OpenAIConversationItemTruncate(
             type = "conversation.item.truncate",
             itemId = itemId,
             audioEndMs = audioEndMs,
