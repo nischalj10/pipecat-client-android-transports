@@ -44,6 +44,7 @@ import kotlinx.serialization.json.encodeToJsonElement
 private val JSON = Json {
     ignoreUnknownKeys = true
     explicitNulls = true   // This will encode null values explicitly like turn_detection = null
+    encodeDefaults = true
 }
 
 private val BOT_PARTICIPANT = Participant(
@@ -61,7 +62,8 @@ private val LOCAL_PARTICIPANT = Participant(
 @SuppressLint("UnsafeOptInUsageError")
 @Serializable
 private data class TruncateConversationItemData(
-    val audioEndMs: Int
+    val audioEndMs: Int,
+    val contentIndex: Int = 0
 )
 
 private inline fun <reified E> E.convertToValue(serializer: KSerializer<E>) =
