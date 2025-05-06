@@ -13,11 +13,11 @@ internal data class OpenAIConversationItemTruncate private constructor(
     @SerialName("content_index") val contentIndex: Int = 0
 ) {
     companion object {
-        fun new(itemId: String, audioEndMs: Int) = OpenAIConversationItemTruncate(
+        fun new(itemId: String, audioEndMs: Int, contentIndex: Int = 0) = OpenAIConversationItemTruncate(
             type = "conversation.item.truncate",
             itemId = itemId,
-            audioEndMs = audioEndMs
-            // contentIndex defaults to 0 as it serialized with default value of 0 (we have explicit nulls set to true)
+            audioEndMs = audioEndMs,
+            contentIndex = contentIndex
         )
     }
 }

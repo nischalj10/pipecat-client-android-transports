@@ -430,7 +430,8 @@ class OpenAIRealtimeWebRTCTransport(
                     OpenAIConversationItemTruncate.serializer(),
                     OpenAIConversationItemTruncate.new(
                         itemId = itemId,
-                        audioEndMs = audioEndMs
+                        audioEndMs = audioEndMs,
+                        contentIndex = 0
                     )
                 )
                 resolvedPromiseOk(thread, Unit)
