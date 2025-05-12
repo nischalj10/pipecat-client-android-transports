@@ -1,3 +1,5 @@
+[![Ask DeepWiki](https://deepwiki.com/badge.svg)](https://deepwiki.com/nischalj10/pipecat-client-android-transports)
+
 <h1><div align="center">
  <img alt="pipecat" width="500px" height="auto" src="assets/pipecat-android.png">
 </div></h1>
