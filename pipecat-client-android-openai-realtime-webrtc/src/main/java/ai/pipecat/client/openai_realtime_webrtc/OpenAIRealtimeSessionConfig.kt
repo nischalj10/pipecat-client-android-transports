@@ -20,5 +20,7 @@ data class OpenAIRealtimeSessionConfig(
     val toolChoice: String? = null,
     val temperature: Float? = null,
     @SerialName("input_audio_transcription")
-    val inputAudioTranscription: Value? = null
+    val inputAudioTranscription: Value? = null,
+    // Tracing configuration - can be "auto" string, object, or null
+    val tracing: Value? = null
 )
