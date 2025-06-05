@@ -93,7 +93,7 @@ class OpenAIRealtimeWebRTCTransport(
 
         fun buildConfig(
             apiKey: String,
-            model: String = "gpt-4o-mini-realtime-preview-2024-12-17",
+            model: String,
             initialMessages: List<LLMContextMessage>? = null,
             initialConfig: OpenAIRealtimeSessionConfig? = null
         ): List<ServiceConfig> {
