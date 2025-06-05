@@ -10,6 +10,7 @@ import kotlinx.serialization.Serializable
 data class OpenAIRealtimeSessionConfig(
     val modalities: List<String>? = null,
     val instructions: String? = null,
+    val model: String? = null,
     val voice: String? = null,
     @SerialName("turn_detection")
     val turnDetection: Value? = null,
