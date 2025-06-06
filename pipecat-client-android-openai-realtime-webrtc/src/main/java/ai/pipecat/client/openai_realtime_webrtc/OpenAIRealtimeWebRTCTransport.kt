@@ -413,13 +413,14 @@ class OpenAIRealtimeWebRTCTransport(
                 OpenAIResponseCancel.serializer(),
                 OpenAIResponseCancel.withResponseId(responseId)
             )
+            Log.w(TAG, "Cancelling response with a response ID")
         } ?: run {
             // If no current response ID is available, try with a generic cancel
-            client?.sendDataMessage(
-                OpenAIResponseCancel.serializer(),
-                OpenAIResponseCancel.new()
-            )
-            Log.w(TAG, "Attempting to cancel response without a response ID")
+            // client?.sendDataMessage(
+            //     OpenAIResponseCancel.serializer(),
+            //     OpenAIResponseCancel.new()
+            // )
+            Log.w(TAG, "Skipping attempt to cancel response without a response ID")
         }
     }
 
